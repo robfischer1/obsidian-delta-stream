@@ -2,3 +2,97 @@
 .obsidian-delta-stream-hidden {
 	display: none;
 }
+
+/* ----- Phase 7 writing-arc panel ----- */
+.obsidian-delta-stream-panel {
+	padding: var(--size-4-3);
+	font-size: var(--font-ui-small);
+}
+
+.obsidian-delta-stream-panel .odsp-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: var(--size-4-2);
+}
+
+.obsidian-delta-stream-panel .odsp-title {
+	font-weight: var(--font-bold);
+}
+
+.obsidian-delta-stream-panel .odsp-refresh {
+	padding: var(--size-2-1);
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: var(--text-muted);
+}
+
+.obsidian-delta-stream-panel .odsp-refresh:hover {
+	color: var(--text-normal);
+}
+
+.obsidian-delta-stream-panel .odsp-note-path {
+	color: var(--text-muted);
+	margin-bottom: var(--size-4-3);
+	word-break: break-all;
+}
+
+.obsidian-delta-stream-panel .odsp-totals {
+	background: var(--background-secondary);
+	padding: var(--size-4-2);
+	border-radius: var(--radius-s);
+	margin-bottom: var(--size-4-3);
+}
+
+.obsidian-delta-stream-panel .odsp-session {
+	border-left: 2px solid var(--background-modifier-border);
+	padding: var(--size-2-3) var(--size-4-2);
+	margin-bottom: var(--size-4-2);
+}
+
+.obsidian-delta-stream-panel .odsp-session-timing {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+.obsidian-delta-stream-panel .odsp-session-stats {
+	margin-top: var(--size-2-2);
+}
+
+.obsidian-delta-stream-panel .odsp-reversals {
+	margin-top: var(--size-2-3);
+	padding-top: var(--size-2-2);
+	border-top: 1px dashed var(--background-modifier-border);
+}
+
+.obsidian-delta-stream-panel .odsp-reversals-title {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	margin-bottom: var(--size-2-1);
+}
+
+.obsidian-delta-stream-panel .odsp-reversal {
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-smaller);
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.obsidian-delta-stream-panel .odsp-empty {
+	color: var(--text-muted);
+	padding: var(--size-4-3) 0;
+}
+
+.obsidian-delta-stream-panel .odsp-hint {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.obsidian-delta-stream-panel .odsp-footer {
+	margin-top: var(--size-4-4);
+	padding-top: var(--size-2-3);
+	border-top: 1px solid var(--background-modifier-border);
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}

@@ -4,11 +4,12 @@ import { DeltaStreamSettings, DEFAULT_SETTINGS, DeltaStreamSettingTab } from './
 import { LiveDispatcher } from './capture/dispatcher';
 import { makeCaptureExtension } from './capture/view-plugin';
 import { Persister } from './persistence/persister';
+import { VIEW_TYPE_WRITING_ARC, WritingArcView } from './panel/view';
 
 export default class DeltaStreamPlugin extends Plugin {
 	settings: DeltaStreamSettings = DEFAULT_SETTINGS;
+	dispatcher: LiveDispatcher | null = null;
 	private statusBarEl: HTMLElement | null = null;
-	private dispatcher: LiveDispatcher | null = null;
 	private persister: Persister | null = null;
 
 	async onload() {
@@ -40,6 +41,22 @@ export default class DeltaStreamPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new DeltaStreamSettingTab(this.app, this));
+
+		// Phase 7 — register the writing-arc side panel.
+		this.registerView(
+			VIEW_TYPE_WRITING_ARC,
+			(leaf: WorkspaceLeaf) => new WritingArcView(leaf, this),
+		);
+		this.addRibbonIcon('pencil-line', 'Open writing arc', async () => {
+			await this.openWritingArcView();
+		});
+		this.addCommand({
+			id: 'open-writing-arc',
+			name: 'Open writing arc panel',
+			callback: async () => {
+				await this.openWritingArcView();
+			},
+		});
 
 		// Phase 2 — register the CodeMirror 6 capture extension.
 		this.registerEditorExtension(makeCaptureExtension(this.dispatcher));
@@ -83,6 +100,23 @@ export default class DeltaStreamPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	async openWritingArcView(): Promise<void> {
+		const { workspace } = this.app;
+		const existing = workspace.getLeavesOfType(VIEW_TYPE_WRITING_ARC);
+		if (existing.length > 0) {
+			const target = existing[0];
+			if (target !== undefined) {
+				await workspace.revealLeaf(target);
+				return;
+			}
+		}
+		const leaf = workspace.getRightLeaf(false);
+		if (leaf !== null) {
+			await leaf.setViewState({ type: VIEW_TYPE_WRITING_ARC, active: true });
+			await workspace.revealLeaf(leaf);
+		}
 	}
 
 	refreshStatusBar(): void {

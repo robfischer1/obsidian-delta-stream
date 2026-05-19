@@ -2,7 +2,7 @@
 
 Personal Obsidian plugin that captures CodeMirror 6 editing deltas — insertions, deletions, pauses, selections — as an append-only event log. The `.md` file stays canonical; the delta stream is the substrate underneath it.
 
-**Status:** Phase 4 settings + privacy controls complete (2026-05-19). Full settings tab live, capture is off by default per vault, exclusions take effect at the capture layer (zero events emitted for excluded notes), and a one-click "Add never-draft folders" shortcut is offered. Phase 5 (phdb ingest), Phase 6 (MCP), and Phase 7 (writing-arc panel) follow.
+**Status:** Phase 7 writing-arc panel complete (2026-05-19). Capture → NDJSON → phdb adapter → MCP query surface → in-Obsidian side panel. Phase 5 ingest adapter + 6 MCP tools live in `personal-history-db` (commits `4341e25`, `2aad8a0`). Plan-side phases 1-7 are all built; awaiting manual end-to-end verification in a test vault.
 
 **Privacy:** Local-only. No cloud sync. Off by default per vault. Personal infrastructure — not for distribution.
 
@@ -60,6 +60,9 @@ The implementation plan lives in the vault at `Outputs/Plans/Writing Delta Strea
 2. **CM6 capture extension** *(complete)* — `ViewPlugin` reading `ViewUpdate` transactions; events land in an in-memory ring buffer.
 3. **NDJSON persistence** *(complete)* — append-only day-partitioned files at `~/Obsidian/delta-stream-data/`; flushes on interval + every `session-end`.
 4. **Settings + privacy controls** *(complete)* — full settings tab with capture/storage/privacy sections, exclusion list with "Add never-draft folders" shortcut, and live status-bar indicator visibility.
+5. **personal-history-db ingest adapter** *(complete)* — see `personal-history-db/src/phdb/adapters/writing_deltas.py` + migration `0015_writing_deltas`. Idempotent NDJSON ingest into typed `writing_sessions` + `writing_deltas` tables.
+6. **MCP query surface** *(complete)* — `writing_arc`, `writing_session_detail`, `writing_stats` tools exposed via `personal-history-db/server.py`.
+7. **Writing-arc panel** *(complete)* — Obsidian `ItemView` reading the plugin's own NDJSON (locked Phase 7 transport: NDJSON-direct, no DB dependency). Shows sessions for the active note with timing, char in/out, rewrite ratio, and reversal pairs.
 5. **personal-history-db ingest adapter** — migration `0013_writing_deltas`, typed columns.
 6. **MCP query surface** — `writing_arc`, `writing_session_for_note`.
 7. **Writing-arc panel** — Obsidian sidebar `ItemView` reading the MCP surface.
