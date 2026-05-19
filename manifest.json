@@ -1,0 +1,9 @@
+{
+	"id": "obsidian-delta-stream",
+	"name": "Writing Delta Stream Capture",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Captures editing deltas (insertions, deletions, pauses, selections) from the CodeMirror 6 editor as an append-only event log. Local-only; off by default per vault. Personal infrastructure — not for distribution.",
+	"author": "Rob Fischer",
+	"isDesktopOnly": true
+}
