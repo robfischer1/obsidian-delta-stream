@@ -1,18 +1,30 @@
-import { MarkdownView, Plugin, type WorkspaceLeaf } from 'obsidian';
+import { MarkdownView, Notice, Plugin, type WorkspaceLeaf } from 'obsidian';
 
 import { DeltaStreamSettings, DEFAULT_SETTINGS, DeltaStreamSettingTab } from './settings';
 import { LiveDispatcher } from './capture/dispatcher';
 import { makeCaptureExtension } from './capture/view-plugin';
+import { Persister } from './persistence/persister';
 
 export default class DeltaStreamPlugin extends Plugin {
 	settings: DeltaStreamSettings = DEFAULT_SETTINGS;
 	private statusBarEl: HTMLElement | null = null;
 	private dispatcher: LiveDispatcher | null = null;
+	private persister: Persister | null = null;
 
 	async onload() {
 		await this.loadSettings();
 
 		this.dispatcher = new LiveDispatcher(this.app, () => this.settings);
+
+		// Phase 3 — wire the persister to drain the ring buffer to NDJSON.
+		this.persister = new Persister(this.dispatcher.buffer, {
+			storageDirectory: this.settings.storageDirectory,
+			onError: (err) => {
+				new Notice(`Delta stream write failed: ${err.message}`);
+				console.error('obsidian-delta-stream persister error', err);
+			},
+		});
+		this.persister.start(this.settings.flushIntervalMs);
 
 		this.statusBarEl = this.addStatusBarItem();
 		this.refreshStatusBar();
@@ -54,7 +66,12 @@ export default class DeltaStreamPlugin extends Plugin {
 	}
 
 	onunload() {
+		// Close the active session first so the session-end event lands in the
+		// buffer before the persister drains it.
 		this.dispatcher?.handleUnload();
+		// Fire-and-forget stop — Obsidian doesn't wait on async unload.
+		void this.persister?.stop();
+		this.persister = null;
 		this.dispatcher = null;
 		this.statusBarEl = null;
 	}

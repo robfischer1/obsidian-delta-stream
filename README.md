@@ -2,7 +2,7 @@
 
 Personal Obsidian plugin that captures CodeMirror 6 editing deltas — insertions, deletions, pauses, selections — as an append-only event log. The `.md` file stays canonical; the delta stream is the substrate underneath it.
 
-**Status:** Phase 2 CodeMirror 6 capture extension complete (2026-05-19). Events accumulate in an in-memory ring buffer; persistence, ingest, and consumer phases follow.
+**Status:** Phase 3 persistence layer complete (2026-05-19). Events stream from CM6 → ring buffer → append-only NDJSON at `~/Obsidian/delta-stream-data/YYYY-MM-DD.ndjson`. Phase 4 (settings UI), Phase 5 (phdb ingest), Phase 6 (MCP), and Phase 7 (writing-arc panel) follow.
 
 **Privacy:** Local-only. No cloud sync. Off by default per vault. Personal infrastructure — not for distribution.
 
@@ -20,7 +20,11 @@ Personal Obsidian plugin that captures CodeMirror 6 editing deltas — insertion
 | `src/capture/changes.ts` | Pure `ChangeSet → DocChangeEvent[]` extraction (testable without an EditorView) |
 | `src/capture/view-plugin.ts` | CodeMirror 6 ViewPlugin adapter |
 | `src/capture/dispatcher.ts` | Obsidian-facing wiring — active file, sessions, ring buffer, frontmatter type lookup |
-| `src/capture/__tests__/` | vitest suite — 34 tests across 5 files |
+| `src/capture/__tests__/` | vitest suite for capture — 34 tests across 5 files |
+| `src/persistence/paths.ts` | Day-partitioned NDJSON filename + storage-dir defaulting |
+| `src/persistence/writer.ts` | Append-only NDJSON writer; concurrent calls serialise through a promise queue |
+| `src/persistence/persister.ts` | Ring-buffer subscriber that buckets by day, flushes on interval + session-end |
+| `src/persistence/__tests__/` | vitest suite for persistence — 19 tests across 3 files |
 | `manifest.json` | Obsidian plugin manifest (id `obsidian-delta-stream`, desktop-only) |
 | `esbuild.config.mjs` | Bundles `src/main.ts` → `main.js` |
 | `eslint.config.mts` | `eslint-plugin-obsidianmd` flat config |
@@ -54,7 +58,7 @@ The implementation plan lives in the vault at `Outputs/Plans/Writing Delta Strea
 
 1. **Scaffold** *(complete)* — TypeScript + esbuild, eslint-plugin-obsidianmd, minimal plugin shell.
 2. **CM6 capture extension** *(complete)* — `ViewPlugin` reading `ViewUpdate` transactions; events land in an in-memory ring buffer.
-3. **NDJSON persistence** — append-only day-partitioned files at `~/Obsidian/delta-stream-data/`.
+3. **NDJSON persistence** *(complete)* — append-only day-partitioned files at `~/Obsidian/delta-stream-data/`; flushes on interval + every `session-end`.
 4. **Settings + privacy controls** — folder exclusions, never-draft shortcut, status indicator.
 5. **personal-history-db ingest adapter** — migration `0013_writing_deltas`, typed columns.
 6. **MCP query surface** — `writing_arc`, `writing_session_for_note`.
