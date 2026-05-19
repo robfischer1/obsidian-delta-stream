@@ -33,3 +33,42 @@ export const DEFAULT_SETTINGS: DeltaStreamSettings = {
 	excludedFolders: [],
 	showStatusBarIndicator: true,
 };
+
+/**
+ * The three vault folders subject to `COWORK.md §3.6`'s never-draft rule.
+ * Not seeded into the default exclusion list (Phase 0 Q11 — Rob declined
+ * default exclusion since the rule restricts AI authoring, not capture of
+ * Rob's own writing). Offered as a one-click shortcut in the settings tab.
+ */
+export const NEVER_DRAFT_FOLDERS: readonly string[] = [
+	'Outputs/The Tao of Rob',
+	"Outputs/Rob's Hammer",
+	'Outputs/The Diuniverse',
+];
+
+/** Parse a multi-line textarea into the exclusion-list shape (trimmed, no empties). */
+export function parseExcludedFolders(text: string): string[] {
+	return text
+		.split('\n')
+		.map((s) => s.trim())
+		.filter((s) => s.length > 0);
+}
+
+/** Merge the never-draft folders into the current list, deduped, preserving prior order. */
+export function withNeverDraftFolders(current: readonly string[]): string[] {
+	const seen = new Set<string>();
+	const out: string[] = [];
+	for (const f of current) {
+		if (!seen.has(f)) {
+			seen.add(f);
+			out.push(f);
+		}
+	}
+	for (const f of NEVER_DRAFT_FOLDERS) {
+		if (!seen.has(f)) {
+			seen.add(f);
+			out.push(f);
+		}
+	}
+	return out;
+}

@@ -85,8 +85,12 @@ export default class DeltaStreamPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	private refreshStatusBar() {
+	refreshStatusBar(): void {
 		if (this.statusBarEl === null) return;
+		this.statusBarEl.toggleClass(
+			'obsidian-delta-stream-hidden',
+			!this.settings.showStatusBarIndicator,
+		);
 		this.statusBarEl.setText(
 			this.settings.enabled ? 'Delta capture: on' : 'Delta capture: off',
 		);

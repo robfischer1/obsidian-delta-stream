@@ -1,8 +1,4 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+/* Status-bar indicator visibility — toggled by main.ts refreshStatusBar(). */
+.obsidian-delta-stream-hidden {
+	display: none;
+}
