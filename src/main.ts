@@ -62,11 +62,16 @@ export default class DeltaStreamPlugin extends Plugin {
 		this.registerEditorExtension(makeCaptureExtension(this.dispatcher));
 
 		// Track the active markdown file so capture events carry the right notePath.
+		// Important: only update on markdown-leaf changes. Switching focus to any
+		// non-markdown view (this plugin's side panel, settings, file explorer, …)
+		// must not close the current writing session — that would create spurious
+		// session boundaries every time the user glances at the panel.
 		this.registerEvent(
 			this.app.workspace.on('active-leaf-change', (leaf: WorkspaceLeaf | null) => {
-				const view = leaf?.view;
-				const file = view instanceof MarkdownView ? view.file : null;
-				this.dispatcher?.setActiveFile(file);
+				if (leaf === null) return;
+				const view = leaf.view;
+				if (!(view instanceof MarkdownView)) return;
+				this.dispatcher?.setActiveFile(view.file);
 			}),
 		);
 

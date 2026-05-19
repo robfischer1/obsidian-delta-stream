@@ -51,9 +51,14 @@ export class WritingArcView extends ItemView {
 
 		this.registerEvent(
 			this.app.workspace.on('active-leaf-change', (leaf) => {
-				const view = leaf?.view;
-				const file = view instanceof MarkdownView ? view.file : null;
-				const path = file?.path ?? null;
+				// Only re-target when a *markdown* leaf becomes active. Clicking
+				// the refresh button (or anything else inside this panel) fires
+				// active-leaf-change with the panel itself as the new leaf, which
+				// would otherwise blank the view.
+				if (leaf === null) return;
+				const view = leaf.view;
+				if (!(view instanceof MarkdownView)) return;
+				const path = view.file?.path ?? null;
 				if (path === this.currentNotePath) return;
 				this.currentNotePath = path;
 				void this.refresh();
